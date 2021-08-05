@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io/ioutil"
 	"log"
 	"os"
@@ -81,9 +82,23 @@ func realMain() error {
 			return err
 		}
 	default: // "create"
-		err := ioutil.WriteFile(path, []byte(data), perm)
-		if err != nil {
-			return err
+		if _, err := os.Stat(path); err == nil {
+			file_origin, err := ioutil.ReadFile(path)
+			if err != nil {
+				return err
+			}
+
+			if !bytes.Equal(file_origin, []byte(data)) {
+				err := ioutil.WriteFile(path, []byte(data), perm)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			err := ioutil.WriteFile(path, []byte(data), perm)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
