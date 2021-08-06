@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -95,6 +96,15 @@ func realMain() error {
 				}
 			}
 		} else {
+			dirPath := filepath.Dir(path)
+
+			if _, serr := os.Stat(dirPath); serr != nil {
+				merr := os.MkdirAll(dirPath, os.ModePerm)
+				if merr != nil {
+					panic(merr)
+				}
+			}
+
 			err := ioutil.WriteFile(path, []byte(data), perm)
 			if err != nil {
 				return err
